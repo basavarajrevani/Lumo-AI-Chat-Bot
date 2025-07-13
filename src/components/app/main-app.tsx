@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LandingPage } from '@/components/landing/landing-page';
-import { ChatInterface } from '@/components/chat/chat-interface';
-import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { LandingPage } from '../landing/landing-page';
+import { ChatInterface } from '../chat/chat-interface';
+import { ErrorBoundary } from '../ui/error-boundary';
 
 export function MainApp() {
   const [showChat, setShowChat] = useState(false);

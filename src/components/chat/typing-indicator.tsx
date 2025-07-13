@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LogoMark } from '@/components/ui/logo';
+import { LogoMark } from '../../components/ui/logo';
 
 export function TypingIndicator() {
   const dotVariants = {

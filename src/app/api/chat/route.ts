@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
-import { ChatRequest, ChatResponse } from '@/types/chat';
+import { ChatRequest, ChatResponse } from '../../../types/chat';
 
 // Initialize the Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');

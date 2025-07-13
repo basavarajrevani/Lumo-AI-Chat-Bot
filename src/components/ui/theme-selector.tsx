@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Palette, Check, Sun, Moon, X } from 'lucide-react';
-import { ThemeService, Theme, themes } from '@/services/theme-service';
+import { ThemeService, Theme, themes } from '../../services/theme-service';
 import toast from 'react-hot-toast';
 
 interface ThemeSelectorProps {

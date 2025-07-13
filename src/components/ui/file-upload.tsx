@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, Upload, X, File, Image, FileText, Code } from 'lucide-react';
-import { FileService, FileUploadResult } from '@/services/file-service';
+import { FileService, FileUploadResult } from '../../services/file-service';
 import toast from 'react-hot-toast';
 
 interface FileUploadProps {

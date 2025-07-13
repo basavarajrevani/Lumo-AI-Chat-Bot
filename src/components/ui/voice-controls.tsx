@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX, Settings } from 'lucide-react';
-import { getVoiceService } from '@/services/voice-service';
+import { getVoiceService } from '../../services/voice-service';
 import toast from 'react-hot-toast';
 
 interface VoiceControlsProps {

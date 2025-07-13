@@ -6,9 +6,9 @@ import { Copy, Check, Edit, Trash2, ThumbsUp, ThumbsDown, Download, FileText, Fi
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { LogoMark } from '@/components/ui/logo';
-import { Message } from '@/types/chat';
-import { DownloadService } from '@/services/download-service';
+import { LogoMark } from '../../components/ui/logo';
+import { Message } from '../../types/chat';
+import { DownloadService } from '../../services/download-service';
 import toast from 'react-hot-toast';
 
 interface ChatMessageProps {

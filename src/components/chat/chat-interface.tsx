@@ -3,16 +3,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Save, MoreVertical, FileText, X } from 'lucide-react';
-import { Logo } from '@/components/ui/logo';
+import { Logo } from '../../components/ui/logo';
 import { ChatMessage } from './chat-message';
 import { TypingIndicator } from './typing-indicator';
-import { VoiceControls } from '@/components/ui/voice-controls';
-import { FileUpload } from '@/components/ui/file-upload';
-import { ConversationHistory } from '@/components/ui/conversation-history';
-import { useChatStore } from '@/store/chat-store';
-import { getVoiceService } from '@/services/voice-service';
-import { FileService } from '@/services/file-service';
-import { ConversationService } from '@/services/conversation-service';
+import { VoiceControls } from '../../components/ui/voice-controls';
+import { FileUpload } from '../../components/ui/file-upload';
+import { ConversationHistory } from '../../components/ui/conversation-history';
+import { useChatStore } from '../../store/chat-store';
+import { getVoiceService } from '../../services/voice-service';
+import { FileService } from '../../services/file-service';
+import { ConversationService } from '../../services/conversation-service';
 import toast from 'react-hot-toast';
 
 export function ChatInterface() {

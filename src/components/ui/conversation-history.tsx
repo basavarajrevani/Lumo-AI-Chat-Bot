@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, Search, Download, Trash2, MessageSquare, Calendar, Tag, X } from 'lucide-react';
-import { ConversationService, ConversationSummary } from '@/services/conversation-service';
+import { ConversationService, ConversationSummary } from '../../services/conversation-service';
 import toast from 'react-hot-toast';
 
 interface ConversationHistoryProps {

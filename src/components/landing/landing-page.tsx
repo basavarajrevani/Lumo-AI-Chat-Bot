@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MessageSquare, Zap, Shield, Sparkles, Brain, Globe, Users } from 'lucide-react';
-import { Logo } from '@/components/ui/logo';
-import { SocialLinks, MadeWithLove } from '@/components/ui/social-links';
-import { PrivacyPolicy } from '@/components/legal/privacy-policy';
-import { TermsOfService } from '@/components/legal/terms-of-service';
-import { Support } from '@/components/support/support';
-import { Contact } from '@/components/contact/contact';
+import { Logo } from '../../components/ui/logo';
+import { SocialLinks, MadeWithLove } from '../../components/ui/social-links';
+import { PrivacyPolicy } from '../../components/legal/privacy-policy';
+import { TermsOfService } from '../../components/legal/terms-of-service';
+import { Support } from '../../components/support/support';
+import { Contact } from '../../components/contact/contact';
 
 interface LandingPageProps {
   onGetStarted: () => void;

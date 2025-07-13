@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Message, ChatState, FileContext } from '@/types/chat';
+import { Message, ChatState, FileContext } from '../types/chat';
 
 interface ChatStore extends ChatState {
   sendMessage: (content: string) => Promise<void>;
