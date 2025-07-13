@@ -1,0 +1,41 @@
+Sample Document for Testing File Upload and Q&A
+
+This is a test document to verify that the file upload and question-answering functionality works correctly in the Lumo AI chatbot.
+
+Key Information in this Document:
+1. Company Name: TechCorp Solutions
+2. Founded: 2020
+3. CEO: Sarah Johnson
+4. Headquarters: San Francisco, California
+5. Number of Employees: 150
+6. Main Products:
+   - Cloud Computing Services
+   - AI-powered Analytics Platform
+   - Mobile App Development Tools
+   - Cybersecurity Solutions
+
+Recent Achievements:
+- Won "Best AI Startup" award in 2023
+- Raised $50 million in Series B funding
+- Expanded to 5 new countries
+- Launched revolutionary AI platform "TechAI Pro"
+
+Financial Information:
+- Annual Revenue: $25 million (2023)
+- Growth Rate: 200% year-over-year
+- Profit Margin: 15%
+- Customer Base: 500+ enterprise clients
+
+Future Plans:
+- Launch IPO in 2025
+- Expand AI research team
+- Open new offices in Europe and Asia
+- Develop quantum computing solutions
+
+Contact Information:
+- Email: info@techcorp.com
+- Phone: +1-555-0123
+- Website: www.techcorp.com
+- Address: 123 Innovation Drive, San Francisco, CA 94105
+
+This document contains various types of information that users should be able to ask questions about after uploading it to the chatbot.
