@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: lumo-ai-chat-bot
+    runtime: node
+    plan: free  # Change to 'starter' or higher for production
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      # Optional email configuration
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_SECURE
+        value: false
+      # Set these manually in Render dashboard for security:
+      # EMAIL_USER, EMAIL_PASS, CONTACT_EMAIL
+    autoDeploy: true
+    branch: main
+    rootDir: .
+    
+    # Health check configuration
+    healthCheckPath: /
+    
+    # Custom headers for security
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
