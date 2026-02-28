@@ -103,6 +103,8 @@ export async function POST(request: NextRequest) {
 
     // 6. API Call
     const model = process.env.GEMINI_MODEL || 'google/gemini-2.0-flash-001';
+    const appUrl = process.env.RENDER_EXTERNAL_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
     console.log(`[Chat API] Calling OpenRouter with ${messages.length} messages`);
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        "HTTP-Referer": appUrl,
         "X-Title": "Lumo.AI",
       },
       body: JSON.stringify({

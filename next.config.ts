@@ -21,6 +21,21 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  async redirects() {
+    return [
+      // Example: Redirect old about page to new one
+      // {
+      //   source: '/about-us',
+      //   destination: '/about',
+      //   permanent: true,
+      // },
+    ]
+  },
+  async rewrites() {
+    return [
+      // Add your rewrites here
+    ]
+  },
 };
 
 export default nextConfig;

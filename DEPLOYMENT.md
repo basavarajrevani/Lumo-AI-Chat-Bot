@@ -85,7 +85,7 @@ docker run -p 3000:3000 -e GOOGLE_GEMINI_API_KEY=your_key lumo-ai
 ## 🔧 Environment Configuration
 
 ### Required Variables:
-- `GOOGLE_GEMINI_API_KEY`: Your Gemini API key
+- `GEMINI_API_KEY`: Your Gemini API key from OpenRouter
 - `NEXT_PUBLIC_APP_URL`: Your app's URL
 
 ### Optional Variables:
