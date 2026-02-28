@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MessageSquare, Zap, Shield, Sparkles, Brain, Globe, FileText } from 'lucide-react';
+import { ArrowRight, MessageSquare, Zap, Shield, Sparkles, Brain, Globe, FileText, Menu, X } from 'lucide-react';
 import { Logo } from '../../components/ui/logo';
 import { SocialLinks, MadeWithLove } from '../../components/ui/social-links';
 import { PrivacyPolicy } from '../../components/legal/privacy-policy';
@@ -16,6 +16,7 @@ interface LandingPageProps {
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'support' | 'contact' | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const features = [
     {
@@ -78,20 +79,61 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="w-full p-4 sm:p-6 lg:p-8"
+        className="w-full p-4 sm:p-6 lg:p-8 relative z-50"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Logo size="lg" animated={true} />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onGetStarted}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <MessageSquare className="w-4 h-4" />
-            Chat Now
-          </motion.button>
+          <div className="flex items-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onGetStarted}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Chat Now
+            </motion.button>
+
+            {/* Mobile Hamburger toggle */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="sm:hidden p-2 rounded-xl bg-primary/10 text-primary"
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </motion.button>
+          </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-full left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-b border-border shadow-xl sm:hidden"
+            >
+              <nav className="flex flex-col gap-4">
+                <button
+                  onClick={() => {
+                    onGetStarted();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center justify-between p-4 bg-primary text-primary-foreground rounded-xl font-bold"
+                >
+                  <span>Chat with Lumo AI</span>
+                  <MessageSquare className="w-5 h-5" />
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => { setActiveModal('support'); setIsMenuOpen(false); }} className="p-3 text-sm font-medium bg-muted rounded-lg text-center">Support</button>
+                  <button onClick={() => { setActiveModal('contact'); setIsMenuOpen(false); }} className="p-3 text-sm font-medium bg-muted rounded-lg text-center">Contact</button>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.header>
 
       {/* Hero Section */}

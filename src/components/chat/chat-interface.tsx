@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Save, MoreVertical, FileText, X, Globe, Sparkles } from 'lucide-react';
+import { Send, Save, MoreVertical, FileText, X, Globe, Sparkles, Menu } from 'lucide-react';
 import { Logo } from '../../components/ui/logo';
 import { ChatMessage } from './chat-message';
 import { TypingIndicator } from './typing-indicator';
@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 export function ChatInterface() {
   const [message, setMessage] = useState('');
   const [isSpeakEnabled, setIsSpeakEnabled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -174,16 +175,16 @@ export function ChatInterface() {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="flex items-center justify-between p-2 sm:p-3 lg:p-4 border-b border-border bg-card/80 backdrop-blur-md relative z-10"
+        className="flex items-center justify-between p-2 sm:p-3 lg:p-4 border-b border-border bg-card/80 backdrop-blur-md relative z-50"
       >
-        <Logo size="md" animated={true} />
-
-        <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 header-controls">
-          {/* File Context Indicator */}
+        <div className="flex items-center gap-2">
+          <Logo size="md" animated={true} />
+          {/* File Context Indicator - Visible even on mobile */}
           {uploadedFiles.length > 0 && (
-            <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-lg text-xs">
+            <div className="flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-lg text-[10px] sm:text-xs">
               <FileText className="w-3 h-3" />
-              <span>{uploadedFiles.length} file{uploadedFiles.length > 1 ? 's' : ''}</span>
+              <span className="hidden sm:inline">{uploadedFiles.length} file{uploadedFiles.length > 1 ? 's' : ''}</span>
+              <span className="sm:hidden">{uploadedFiles.length}</span>
               <button
                 onClick={() => {
                   clearFileContext();
@@ -196,111 +197,243 @@ export function ChatInterface() {
               </button>
             </div>
           )}
+        </div>
 
-          {/* Persona Selector */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-all duration-200 border border-primary/20">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{PERSONAS.find(p => p.id === currentPersonaId)?.name || 'General'}</span>
-            </button>
-            <div className="absolute right-0 mt-2 w-64 bg-popover border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-1.5">
-              <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Select Persona
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop Controls - Hidden on Mobile */}
+          <div className="hidden lg:flex items-center gap-2 lg:gap-3">
+            {/* Persona Selector */}
+            <div className="relative group">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-xs font-medium transition-all duration-200 border border-primary/20">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{PERSONAS.find(p => p.id === currentPersonaId)?.name || 'General'}</span>
+              </button>
+              <div className="absolute right-0 mt-2 w-64 bg-popover border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-1.5">
+                <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  Select Persona
+                </div>
+                {PERSONAS.map((persona) => (
+                  <button
+                    key={persona.id}
+                    onClick={() => {
+                      setPersonaId(persona.id);
+                      toast.success(`Persona switched to ${persona.name}`);
+                    }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-accent transition-all duration-200 flex items-start gap-3 group/item ${currentPersonaId === persona.id ? 'bg-accent border border-accent-foreground/10' : 'border border-transparent'
+                      }`}
+                  >
+                    <span className="text-xl bg-background rounded-lg p-1.5 shadow-sm">{persona.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold truncate group-hover/item:text-primary transition-colors">{persona.name}</div>
+                      <div className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">{persona.description}</div>
+                    </div>
+                  </button>
+                ))}
               </div>
-              {PERSONAS.map((persona) => (
-                <button
-                  key={persona.id}
-                  onClick={() => {
-                    setPersonaId(persona.id);
-                    toast.success(`Persona switched to ${persona.name}`);
-                  }}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-accent transition-all duration-200 flex items-start gap-3 group/item ${currentPersonaId === persona.id ? 'bg-accent border border-accent-foreground/10' : 'border border-transparent'
-                    }`}
-                >
-                  <span className="text-xl bg-background rounded-lg p-1.5 shadow-sm">{persona.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold truncate group-hover/item:text-primary transition-colors">{persona.name}</div>
-                    <div className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">{persona.description}</div>
-                  </div>
-                </button>
-              ))}
             </div>
-          </div>
 
-          {/* Language Selector */}
-          <div className="relative group">
-            <button className="flex items-center gap-1 px-2 py-1 bg-secondary hover:bg-secondary/80 rounded-lg text-xs transition-colors">
-              <Globe className="w-3 h-3" />
-              <span className="uppercase">{currentLanguage.split('-')[0]}</span>
-            </button>
-            <div className="absolute right-0 mt-1 w-32 bg-popover border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              {[
-                { label: 'English', value: 'en-US' },
-                { label: 'Hindi', value: 'hi-IN' },
-                { label: 'Spanish', value: 'es-ES' },
-                { label: 'French', value: 'fr-FR' },
-                { label: 'German', value: 'de-DE' },
-              ].map((lang) => (
-                <button
-                  key={lang.value}
-                  onClick={() => {
-                    setLanguage(lang.value);
-                    toast.success(`Language set to ${lang.label}`);
-                  }}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-accent transition-colors first:rounded-t-lg last:rounded-b-lg ${currentLanguage === lang.value ? 'bg-accent font-medium' : ''
-                    }`}
-                >
-                  {lang.label}
-                </button>
-              ))}
+            {/* Language Selector */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 px-2 py-1 bg-secondary hover:bg-secondary/80 rounded-lg text-xs transition-colors">
+                <Globe className="w-3 h-3" />
+                <span className="uppercase">{currentLanguage.split('-')[0]}</span>
+              </button>
+              <div className="absolute right-0 mt-1 w-32 bg-popover border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                {[
+                  { label: 'English', value: 'en-US' },
+                  { label: 'Hindi', value: 'hi-IN' },
+                  { label: 'Spanish', value: 'es-ES' },
+                  { label: 'French', value: 'fr-FR' },
+                  { label: 'German', value: 'de-DE' },
+                ].map((lang) => (
+                  <button
+                    key={lang.value}
+                    onClick={() => {
+                      setLanguage(lang.value);
+                      toast.success(`Language set to ${lang.label}`);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-xs hover:bg-accent transition-colors first:rounded-t-lg last:rounded-b-lg ${currentLanguage === lang.value ? 'bg-accent font-medium' : ''
+                      }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Voice Controls */}
-          <div className="hidden sm:block">
             <VoiceControls
               onVoiceInput={handleVoiceInput}
               onSpeakToggle={setIsSpeakEnabled}
               isSpeakEnabled={isSpeakEnabled}
             />
+
+            <ConversationHistory onLoadConversation={handleLoadConversation} />
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSaveConversation}
+              className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              title="Save conversation"
+            >
+              <Save className="w-5 h-5" />
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleClearMessages}
+              className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              title="Clear conversation"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </motion.button>
           </div>
 
-
-          {/* Conversation History */}
-          <ConversationHistory onLoadConversation={handleLoadConversation} />
-
-          {/* Save Conversation */}
+          {/* Hamburger Menu Toggle - Visible only on Mobile/Tablet */}
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleSaveConversation}
-            className="p-2 sm:p-3 rounded-lg hover:bg-muted transition-colors"
-            title="Save conversation"
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
           >
-            <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </motion.button>
-
-          {/* More Options */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleClearMessages}
-            className="p-2 sm:p-3 rounded-lg hover:bg-muted transition-colors"
-            title="Clear conversation"
-          >
-            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
-          </motion.button>
-
-          {/* Mobile Voice Controls */}
-          <div className="sm:hidden">
-            <VoiceControls
-              onVoiceInput={handleVoiceInput}
-              onSpeakToggle={setIsSpeakEnabled}
-              isSpeakEnabled={isSpeakEnabled}
-            />
-          </div>
         </div>
       </motion.header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-40 lg:hidden"
+          >
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-background/80 backdrop-blur-md"
+              onClick={() => setIsMenuOpen(false)}
+            />
+
+            {/* Menu Content */}
+            <div className="absolute right-0 top-0 bottom-0 w-[280px] bg-card border-l border-border shadow-2xl p-6 overflow-y-auto">
+              <div className="flex flex-col gap-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold">Menu</h2>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="p-2 hover:bg-muted rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Persona Section */}
+                <div className="space-y-4">
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1">
+                    AI Persona
+                  </div>
+                  <div className="grid gap-2">
+                    {PERSONAS.map((persona) => (
+                      <button
+                        key={persona.id}
+                        onClick={() => {
+                          setPersonaId(persona.id);
+                          setIsMenuOpen(false);
+                          toast.success(`Persona switched to ${persona.name}`);
+                        }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 ${currentPersonaId === persona.id
+                            ? 'bg-primary/10 border-primary/30 text-primary'
+                            : 'border-transparent hover:bg-muted'
+                          }`}
+                      >
+                        <span className="text-xl">{persona.icon}</span>
+                        <div className="text-left">
+                          <div className="text-xs font-bold">{persona.name}</div>
+                          <div className="text-[10px] text-muted-foreground line-clamp-1">{persona.description}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Language Section */}
+                <div className="space-y-4">
+                  <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-1">
+                    Language
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'English', value: 'en-US' },
+                      { label: 'Hindi', value: 'hi-IN' },
+                      { label: 'Spanish', value: 'es-ES' },
+                      { label: 'French', value: 'fr-FR' },
+                      { label: 'German', value: 'de-DE' },
+                    ].map((lang) => (
+                      <button
+                        key={lang.value}
+                        onClick={() => {
+                          setLanguage(lang.value);
+                          setIsMenuOpen(false);
+                          toast.success(`Language set to ${lang.label}`);
+                        }}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${currentLanguage === lang.value
+                            ? 'bg-secondary border-secondary-foreground/20'
+                            : 'border-transparent hover:bg-muted'
+                          }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="grid gap-2">
+                    <VoiceControls
+                      onVoiceInput={handleVoiceInput}
+                      onSpeakToggle={setIsSpeakEnabled}
+                      isSpeakEnabled={isSpeakEnabled}
+                    />
+
+                    <button
+                      onClick={() => {
+                        handleSaveConversation();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-all"
+                    >
+                      <Save className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm font-medium">Save Conversation</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        handleClearMessages();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-all text-destructive"
+                    >
+                      <MoreVertical className="w-5 h-5" />
+                      <span className="text-sm font-medium">Clear Chat</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-8 text-center">
+                  <ConversationHistory onLoadConversation={(id) => {
+                    handleLoadConversation(id);
+                    setIsMenuOpen(false);
+                  }} />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-3 lg:p-4 space-y-3 sm:space-y-4 relative z-0">
