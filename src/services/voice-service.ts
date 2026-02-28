@@ -4,6 +4,7 @@ export class VoiceService {
   private isListening = false;
   private onResultCallback: ((text: string) => void) | null = null;
   private onErrorCallback: ((error: string) => void) | null = null;
+  private currentLanguage = 'en-US';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -12,16 +13,27 @@ export class VoiceService {
     }
   }
 
+  public setLanguage(lang: string) {
+    this.currentLanguage = lang;
+    if (this.recognition) {
+      this.recognition.lang = lang;
+    }
+  }
+
+  public getLanguage(): string {
+    return this.currentLanguage;
+  }
+
   private initializeSpeechRecognition() {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-      
+
       if (SpeechRecognition) {
         this.recognition = new SpeechRecognition();
         this.recognition.continuous = false;
         this.recognition.interimResults = false;
-        this.recognition.lang = 'en-US';
-        
+        this.recognition.lang = this.currentLanguage;
+
         this.recognition.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           if (this.onResultCallback) {
@@ -57,9 +69,14 @@ export class VoiceService {
       return false;
     }
 
+    // Ensure lang is correct before starting
+    if (this.recognition) {
+      this.recognition.lang = this.currentLanguage;
+    }
+
     this.onResultCallback = onResult;
     this.onErrorCallback = onError;
-    
+
     try {
       this.recognition.start();
       this.isListening = true;
@@ -92,8 +109,16 @@ export class VoiceService {
       // Cancel any ongoing speech
       this.synthesis.cancel();
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      
+      // Clean the text before speaking
+      const cleanedText = this.cleanText(text);
+      if (!cleanedText.trim()) {
+        resolve();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(cleanedText);
+      utterance.lang = this.currentLanguage;
+
       // Set options
       if (options) {
         utterance.rate = options.rate ?? 1;
@@ -101,6 +126,20 @@ export class VoiceService {
         utterance.volume = options.volume ?? 1;
         if (options.voice) {
           utterance.voice = options.voice;
+        } else {
+          // Try to find a voice that matches the language
+          const voices = this.getAvailableVoices();
+          const matchingVoice = voices.find(v => v.lang === this.currentLanguage || v.lang.startsWith(this.currentLanguage.split('-')[0]));
+          if (matchingVoice) {
+            utterance.voice = matchingVoice;
+          }
+        }
+      } else {
+        // Try to find a voice that matches the language even without options
+        const voices = this.getAvailableVoices();
+        const matchingVoice = voices.find(v => v.lang === this.currentLanguage || v.lang.startsWith(this.currentLanguage.split('-')[0]));
+        if (matchingVoice) {
+          utterance.voice = matchingVoice;
         }
       }
 
@@ -118,6 +157,33 @@ export class VoiceService {
 
       this.synthesis.speak(utterance);
     });
+  }
+
+  private cleanText(text: string): string {
+    return text
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, ' [code block] ')
+      // Remove inline code
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove bold and italic markdown (handles both * and _)
+      .replace(/(\*\*\*|___)(.*?)\1/g, '$2')
+      .replace(/(\*\*|__)(.*?)\1/g, '$2')
+      .replace(/(\*|_)(.*?)\1/g, '$2')
+      // Remove markdown headers
+      .replace(/^#{1,6}\s+/gm, '')
+      // Remove markdown links [text](url) -> text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove horizontal rules
+      .replace(/^(\*|-|_){3,}$/gm, '')
+      // Remove blockquotes > 
+      .replace(/^\s*>\s*/gm, '')
+      // Remove backslashes used for escaping
+      .replace(/\\/g, '')
+      // Replace repetitive symbols (like --- or ===)
+      .replace(/[=\-_]{2,}/g, ' ')
+      // Clean up extra whitespace
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   public stopSpeaking() {

@@ -3,6 +3,7 @@ export interface FileUploadResult {
   fileName: string;
   fileType: string;
   fileSize: number;
+  base64?: string;
 }
 
 export class FileService {
@@ -22,8 +23,11 @@ export class FileService {
     'image/gif',
     'image/webp',
     'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/msword' // .doc
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.csv', '.txt', '.md', '.json', '.js', '.ts', '.py'
   ];
 
   public static async processFile(file: File): Promise<FileUploadResult> {
@@ -33,24 +37,36 @@ export class FileService {
     }
 
     // Validate file type
-    if (!this.SUPPORTED_TYPES.includes(file.type) && !this.isCodeFile(file.name) && !this.isWordFile(file.name)) {
+    const fileName = file.name.toLowerCase();
+    if (!this.SUPPORTED_TYPES.includes(file.type) &&
+      !this.isCodeFile(fileName) &&
+      !this.isWordFile(fileName) &&
+      !this.isExcelFile(fileName) &&
+      !this.isImageFile(fileName) &&
+      !fileName.endsWith('.pdf')) {
       throw new Error(`Unsupported file type: ${file.type}`);
     }
 
     let content: string;
+    let base64: string | undefined;
 
-    if (file.type.startsWith('image/')) {
-      content = await this.processImage(file);
-    } else if (file.type === 'application/pdf') {
+    if (file.type.startsWith('image/') || this.isImageFile(fileName)) {
+      const imageData = await this.processImage(file);
+      content = imageData.content;
+      base64 = imageData.base64;
+    } else if (file.type === 'application/pdf' || fileName.endsWith('.pdf')) {
       content = await this.processPDF(file);
-    } else if (this.isWordFile(file.name) || file.type.includes('word') || file.type.includes('officedocument')) {
+    } else if (this.isWordFile(fileName) || file.type.includes('word') || file.type.includes('officedocument.wordprocessingml')) {
       content = await this.processWordDocument(file);
+    } else if (this.isExcelFile(fileName) || file.type.includes('excel') || file.type.includes('spreadsheetml')) {
+      content = await this.processExcel(file);
     } else {
       content = await this.processTextFile(file);
     }
 
     return {
       content,
+      base64,
       fileName: file.name,
       fileType: file.type,
       fileSize: file.size
@@ -69,7 +85,7 @@ export class FileService {
     });
   }
 
-  private static async processImage(file: File): Promise<string> {
+  private static async processImage(file: File): Promise<{ content: string; base64: string }> {
     try {
       // Convert image to base64 for Vision API
       const base64Data = await this.convertImageToBase64(file);
@@ -80,7 +96,8 @@ export class FileService {
       const sizeInKB = Math.round(file.size / 1024);
       const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
 
-      return `🖼️ **Image Analysis: ${file.name}**
+      return {
+        content: `🖼️ **Image Analysis: ${file.name}**
 
 📊 **File Info:** ${sizeInKB} KB (${sizeInMB} MB) • ${file.type}
 
@@ -94,19 +111,24 @@ ${description}
 • "Can you read any text in the image?"
 • "What's the mood or atmosphere?"
 
-**Feel free to ask any questions about what you see in the image!** 📸✨`;
+**Feel free to ask any questions about what you see in the image!** 📸✨`,
+        base64: base64Data
+      };
 
     } catch (error) {
       console.error('Error processing image:', error);
       const sizeInKB = Math.round(file.size / 1024);
-      return `🖼️ **Image Uploaded: ${file.name}** (${sizeInKB} KB)
+      return {
+        content: `🖼️ **Image Uploaded: ${file.name}** (${sizeInKB} KB)
 
 ⚠️ **Vision analysis temporarily unavailable.** You can still:
 • Describe what you see and ask for analysis
 • Ask general questions about image content
 • Request help with image-related tasks
 
-**What would you like to know about this image?** 📸`;
+**What would you like to know about this image?** 📸`,
+        base64: await this.convertImageToBase64(file).catch(() => '')
+      };
     }
   }
 
@@ -151,48 +173,90 @@ ${description}
 
   private static async processPDF(file: File): Promise<string> {
     try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfjs = await import('pdfjs-dist');
+
+      // Load the worker from a CDN to avoid complex bundler configuration
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+
+      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        fullText += `--- Page ${i} ---\n${pageText}\n\n`;
+      }
+
+      if (!fullText.trim()) {
+        return `📄 **PDF Content: ${file.name}**\n\nNo text content could be extracted. The PDF might be scanned or contain only images.`;
+      }
+
       const sizeInKB = Math.round(file.size / 1024);
-      const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-
-      return `📄 **PDF Uploaded Successfully: ${file.name}**
-
-📊 **File Info:** ${sizeInKB} KB (${sizeInMB} MB) • PDF Document
-
-⚠️ **Important:** This system cannot automatically extract text from PDFs. To analyze your PDF content:
-
-🔄 **Next Steps:**
-1. **Open your PDF** in any PDF viewer
-2. **Copy the text** 
-3. **Paste it here**
-
-**Ready to analyze your PDF content! Just copy-paste the text you want me to examine.** 📋✨`;
+      return `📄 **PDF Content: ${file.name}** (${sizeInKB} KB)\n\n${fullText}`;
 
     } catch (error) {
       console.error('Error processing PDF:', error);
-      return `[PDF Document: ${file.name}]\nError: Failed to process PDF. ${error instanceof Error ? error.message : 'Unknown error'}`;
+      return `[PDF Document: ${file.name}]\nError: Failed to extract text. ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  private static async processExcel(file: File): Promise<string> {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      // Dynamic import to avoid SSR issues
+      const XLSX = await import('xlsx');
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      let fullText = '';
+
+      workbook.SheetNames.forEach(sheetName => {
+        const worksheet = workbook.Sheets[sheetName];
+        // Convert sheet to CSV format for readable text context
+        const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+        fullText += `--- Sheet: ${sheetName} ---\n${csvContent}\n\n`;
+      });
+
+      if (!fullText.trim()) {
+        return `📊 **Excel Content: ${file.name}**\n\nNo content could be extracted from this spreadsheet.`;
+      }
+
+      const sizeInKB = Math.round(file.size / 1024);
+      return `📊 **Excel Content: ${file.name}** (${sizeInKB} KB)\n\n${fullText}`;
+
+    } catch (error) {
+      console.error('Error processing Excel:', error);
+      return `[Excel Document: ${file.name}]\nError: Failed to extract data. ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }
 
   private static async processWordDocument(file: File): Promise<string> {
     try {
+      const arrayBuffer = await file.arrayBuffer();
+      // Dynamic import to avoid SSR issues
+      const mammoth = await import('mammoth');
+
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      const text = result.value; // The generated raw text
+      const messages = result.messages; // Any messages, such as warnings during conversion
+
+      if (messages.length > 0) {
+        console.warn('Mammoth warnings:', messages);
+      }
+
+      if (!text.trim()) {
+        return `📝 **Word Document Content: ${file.name}**\n\nNo text content could be extracted from this document.`;
+      }
+
       const sizeInKB = Math.round(file.size / 1024);
-      const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+      return `📝 **Word Document Content: ${file.name}** (${sizeInKB} KB)\n\n${text}`;
 
-      return `📝 **Word Document Uploaded: ${file.name}**
-
-📊 **File Info:** ${sizeInKB} KB (${sizeInMB} MB) • Word Document
-
-⚠️ **Important:** This system cannot automatically extract text from Word documents. To analyze your document:
-
-🔄 **Next Steps:**
-1. **Open your Word document** in any compatible viewer
-2. **Copy the text** 
-3. **Paste it here** 
-
-**Ready to help with your Word document content! Just copy-paste the text you'd like me to analyze.** 📄✨`;
     } catch (error) {
       console.error('Error processing Word document:', error);
-      return `[Word Document: ${file.name}]\nError: Failed to process Word document. ${error instanceof Error ? error.message : 'Unknown error'}`;
+      return `[Word Document: ${file.name}]\nError: Failed to extract text. ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }
 
@@ -212,6 +276,16 @@ ${description}
     return wordExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
   }
 
+  private static isExcelFile(fileName: string): boolean {
+    const excelExtensions = ['.xls', '.xlsx', '.csv'];
+    return excelExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
+  }
+
+  private static isImageFile(fileName: string): boolean {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
+  }
+
   public static formatFileForChat(result: FileUploadResult): string {
     const sizeInKB = Math.round(result.fileSize / 1024);
 
@@ -223,8 +297,8 @@ ${description}
 
     if (result.fileType.startsWith('image/')) {
       prompt += `${result.content}\n\n`;
-    } else if (result.content.includes('[PDF Document:') || result.content.includes('[Word Document:') || result.content.includes('**PDF Uploaded') || result.content.includes('**Word Document') || result.content.includes('**Image Uploaded')) {
-      // Handle error messages from PDF/Word processing
+    } else if (result.content.includes('Error: Failed to extract text') || result.content.includes('Error: Failed to extract data')) {
+      // Handle error messages from processing
       prompt += `${result.content}\n\n`;
       prompt += `Please let me know if you can help with this file or if you need it in a different format.`;
     } else {

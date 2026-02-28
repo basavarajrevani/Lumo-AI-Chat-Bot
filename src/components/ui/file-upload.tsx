@@ -69,19 +69,23 @@ export function FileUpload({ onFileProcessed, className = '' }: FileUploadProps)
 
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
-    
+
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
       return <Image className="w-4 h-4" />;
     }
-    
+
     if (['js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'h', 'cs', 'php', 'rb', 'go', 'rs'].includes(extension || '')) {
       return <Code className="w-4 h-4" />;
     }
-    
+
     if (['txt', 'md', 'pdf', 'doc', 'docx'].includes(extension || '')) {
       return <FileText className="w-4 h-4" />;
     }
-    
+
+    if (['xls', 'xlsx', 'csv'].includes(extension || '')) {
+      return <Upload className="w-4 h-4" />; // Or another icon
+    }
+
     return <File className="w-4 h-4" />;
   };
 
@@ -126,7 +130,7 @@ export function FileUpload({ onFileProcessed, className = '' }: FileUploadProps)
           <div className="bg-gray-900 text-white text-xs rounded px-3 py-2 max-w-xs">
             <div className="font-medium mb-1">Upload Files</div>
             <div>Text files: Full analysis</div>
-            <div>PDFs: Upload + copy-paste content</div>
+            <div>PDFs & Documents: Full text extraction</div>
             <div>Images: Visual analysis</div>
           </div>
         </div>
@@ -165,11 +169,10 @@ export function FileUpload({ onFileProcessed, className = '' }: FileUploadProps)
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                  isDragging 
-                    ? 'border-primary bg-primary/5' 
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDragging
+                    ? 'border-primary bg-primary/5'
                     : 'border-border hover:border-primary/50'
-                }`}
+                  }`}
               >
                 <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-lg font-medium mb-2">
@@ -178,7 +181,7 @@ export function FileUpload({ onFileProcessed, className = '' }: FileUploadProps)
                 <p className="text-sm text-muted-foreground mb-4">
                   or click to browse
                 </p>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -197,16 +200,16 @@ export function FileUpload({ onFileProcessed, className = '' }: FileUploadProps)
                 </h4>
                 <div className="text-xs text-blue-700 dark:text-blue-300 space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="font-medium">✅ Text Files:</span>
-                    <span>Full content analysis available</span>
+                    <span className="font-medium">✅ Text & Docs:</span>
+                    <span>Full automatic text extraction (PDF, Word)</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="font-medium">⚠️ PDFs/Word:</span>
-                    <span>Upload for context, then copy-paste content for analysis</span>
+                    <span className="font-medium">📊 Spreadsheets:</span>
+                    <span>Excel and CSV analysis supported</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="font-medium">🖼️ Images:</span>
-                    <span>Visual analysis and description</span>
+                    <span>Vision-based image analysis</span>
                   </div>
                 </div>
               </div>

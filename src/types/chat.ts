@@ -2,6 +2,7 @@ export interface FileContext {
   fileName: string;
   fileType: string;
   content: string;
+  base64?: string;
   uploadedAt: string;
 }
 
@@ -24,6 +25,7 @@ export interface ChatRequest {
   message: string;
   history: Message[];
   fileContext?: FileContext[];
+  personaId?: string;
 }
 
 export interface ChatResponse {

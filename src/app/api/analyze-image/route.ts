@@ -1,8 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Initialize the Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,47 +12,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json(
-        { error: 'Gemini API key is not configured' },
+        { error: 'API key is not configured' },
         { status: 500 }
       );
     }
 
-    // Get the generative model with vision capabilities
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        temperature: 0.4,
-        topP: 0.8,
-        topK: 40,
-        maxOutputTokens: 1024,
+    // OpenRouter API call for vision
+    const model = process.env.GEMINI_MODEL || 'google/gemini-2.0-flash-001';
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        "X-Title": "Lumo.AI",
       },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Please analyze this image and provide a detailed description. Include:\n- What you see in the image (objects, people, animals, etc.)\n- The setting or environment\n- Colors, lighting, and composition\n- Any text visible in the image\n- The overall mood or atmosphere\n- Any notable details or interesting elements\n\nProvide a natural, conversational description as if you're describing the image to someone who can't see it."
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${mimeType};base64,${image}`
+                }
+              }
+            ]
+          }
+        ],
+        temperature: 0.4,
+        max_tokens: 1024,
+      })
     });
 
-    // Create the prompt for image analysis
-    const prompt = `Please analyze this image and provide a detailed description. Include:
-- What you see in the image (objects, people, animals, etc.)
-- The setting or environment
-- Colors, lighting, and composition
-- Any text visible in the image
-- The overall mood or atmosphere
-- Any notable details or interesting elements
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `OpenRouter API error: ${response.status}`);
+    }
 
-Provide a natural, conversational description as if you're describing the image to someone who can't see it.`;
-
-    // Prepare the image data for the API
-    const imagePart = {
-      inlineData: {
-        data: image,
-        mimeType: mimeType
-      }
-    };
-
-    // Generate the response with image and text
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = result.response;
-    const description = response.text();
+    const data = await response.json();
+    const description = data.choices[0].message.content;
 
     return NextResponse.json({
       description: description,
@@ -67,19 +72,14 @@ Provide a natural, conversational description as if you're describing the image 
     console.error('Error in image analysis API:', error);
 
     let errorMessage = 'Failed to analyze image';
-    
     if (error instanceof Error) {
-      if (error.message.includes('429') || error.message.includes('quota')) {
-        errorMessage = 'Image analysis temporarily unavailable due to high usage';
-      } else if (error.message.includes('SAFETY')) {
-        errorMessage = 'Image content cannot be analyzed due to safety restrictions';
-      }
+      errorMessage = error.message;
     }
 
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
-        success: false 
+        success: false
       },
       { status: 500 }
     );

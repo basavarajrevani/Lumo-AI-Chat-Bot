@@ -11,6 +11,10 @@ interface ChatStore extends ChatState {
   setMessages: (messages: Message[]) => void;
   addFileContext: (fileContext: FileContext) => void;
   clearFileContext: () => void;
+  currentLanguage: string;
+  setLanguage: (lang: string) => void;
+  currentPersonaId: string;
+  setPersonaId: (id: string) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -27,14 +31,14 @@ export const useChatStore = create<ChatStore>()(
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
         };
-        
+
         set((state) => ({
           messages: [...state.messages, newMessage],
         }));
       },
 
       sendMessage: async (content: string) => {
-        const { addMessage, uploadedFiles } = get();
+        const { addMessage, uploadedFiles, currentPersonaId } = get();
 
         // Add user message
         addMessage({
@@ -56,11 +60,20 @@ export const useChatStore = create<ChatStore>()(
               message: content,
               history: get().messages,
               fileContext: uploadedFiles,
+              personaId: currentPersonaId,
             }),
           });
 
+          console.log('[ChatStore] Request sent to /api/chat:', {
+            message: content,
+            historyCount: get().messages.length,
+            fileCount: uploadedFiles.length,
+            personaId: currentPersonaId
+          });
+
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || errorData.response || `HTTP error! status: ${response.status}`);
           }
 
           const data = await response.json();
@@ -71,7 +84,6 @@ export const useChatStore = create<ChatStore>()(
             content: data.response,
           });
         } catch (error) {
-          console.error('Error sending message:', error);
           set({
             error: error instanceof Error ? error.message : 'An error occurred',
           });
@@ -117,12 +129,22 @@ export const useChatStore = create<ChatStore>()(
       clearFileContext: () => {
         set({ uploadedFiles: [] });
       },
+      currentLanguage: 'en-US',
+      setLanguage: (lang: string) => {
+        set({ currentLanguage: lang });
+      },
+      currentPersonaId: 'general',
+      setPersonaId: (id: string) => {
+        set({ currentPersonaId: id });
+      },
     }),
     {
       name: 'lumo-chat-storage',
       partialize: (state) => ({
         messages: state.messages.slice(-50), // Keep only last 50 messages
-        uploadedFiles: state.uploadedFiles.slice(-10) // Keep only last 10 uploaded files
+        uploadedFiles: state.uploadedFiles.slice(-10), // Keep only last 10 uploaded files
+        currentLanguage: state.currentLanguage,
+        currentPersonaId: state.currentPersonaId,
       }),
     }
   )

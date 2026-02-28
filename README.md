@@ -11,47 +11,29 @@ A cutting-edge, feature-rich AI-powered chat application built with Next.js 15, 
 ## ✨ Features
 
 ### 🤖 **Advanced AI Capabilities**
-- **Google Gemini Pro Integration**: State-of-the-art AI with context awareness
-- **Gemini Vision API**: Real image analysis and description
-- **Real-time Conversations**: Instant AI responses with typing indicators
-- **Conversation Management**: Save, load, and organize chat history
-- **Context Memory**: AI remembers file uploads throughout conversations
+- **AI Expert Personas**: Switch between specialized experts like Code Master, Creative Writer, and Language Tutor for tailored responses.
+- **Gemini 2.0 Power**: Lightning-fast responses powered by the latest Google Gemini 2.0 Flash models via OpenRouter.
+- **High-Accuracy Vision**: Upload images for deep visual analysis, OCR, and context-aware insights with direct raw data processing.
+- **Smart File Processing**: Extract and analyze content from PDF, Word, and Excel documents instantly.
+- **Context Memory**: AI maintains context from your uploaded files throughout the session.
 
-### 📁 **Comprehensive File Analysis**
-- **Image Analysis**: Upload and get detailed AI descriptions of images
-- **PDF Processing**: Upload PDFs with smart text extraction guidance
-- **Word Document Support**: Handle .doc and .docx files with copy-paste workflow
-- **Code File Analysis**: Support for JavaScript, Python, Java, C++, and more
-- **Text File Processing**: Full analysis of .txt, .md, .csv, .json files
-- **Smart File Detection**: Automatic format recognition and processing
+### 📁 **File & Document Support**
+- **PDF Analysis**: Full text extraction and multi-page document understanding.
+- **Word & Excel**: Process professional documents and analyze tabular data.
+- **Image Analysis**: Direct visual understanding of PNG, JPG, and WebP files.
+- **Text & Code**: Support for all common text-based formats and programming languages.
+- **Secure & Exportable**: Export your chat history to PDF, Word, or Excel formats anytime.
 
-### 📥 **Advanced Download System**
-- **Multiple Export Formats**: PDF, Word, Excel, Text, Markdown
-- **Smart Format Detection**: AI suggests best formats based on content
-- **One-Click Downloads**: Export AI responses in your preferred format
-- **Professional Templates**: Clean, formatted documents with timestamps
-- **Tabular Data Support**: Automatic Excel export for data tables
+### 🎤 **Multi-Language Voice**
+- **Speech-to-Text**: High-accuracy voice input for hands-free interaction.
+- **Text-to-Speech**: Listen to AI responses in multiple languages including English, Hindi, Spanish, and French.
+- **Language Selection**: Easily switch between supported languages for both input and output.
 
-### 🎤 **Voice & Audio Features**
-- **Speech-to-Text**: Voice input with real-time transcription
-- **Text-to-Speech**: AI responses read aloud with natural voices
-- **Voice Controls**: Complete hands-free interaction
-- **Multiple Voice Options**: Choose from various AI voices
-- **Mobile Optimized**: Full voice support on mobile devices
-
-### 🎨 **Professional UI/UX**
-- **Modern Design**: Clean, intuitive interface with smooth animations
-- **Responsive Layout**: Perfect experience on all devices
-- **Interactive Landing Page**: Engaging homepage with feature showcase
-- **Dark/Light Themes**: Automatic theme detection and switching
-- **Mobile-First**: Touch-optimized with gesture support
-
-### 📧 **Contact & Communication**
-- **Real Email Sending**: Direct email delivery from contact form
-- **Professional Templates**: HTML email formatting with branding
-- **Smart Fallback**: Mailto backup if email service unavailable
-- **Form Validation**: Real-time validation and error handling
-- **Success Notifications**: Instant feedback for user actions
+### 🎨 **Modern Experience**
+- **Premium Design**: Sleek, glassmorphic UI with smooth animations and dynamic effects.
+- **Local Privacy**: All your conversations and settings are stored locally in your browser.
+- **Responsive Layout**: Seamless experience across mobile, tablet, and desktop devices.
+- **Dark Mode**: Beautiful, easy-on-the-eyes dark theme for focused work.
 
 ## 🚀 Quick Start
 
@@ -280,7 +262,7 @@ We welcome contributions! Here's how to get started:
 
 **Basavaraj Revani** - *Full Stack Developer & AI Enthusiast*
 
-- 📧 **Email**: [basavarajrevani123@gmail.com](mailto:basavarajrevani123@gmail.com)
+- 📧 **Email**: [basavarajrevani15@gmail.com](mailto:basavarajrevani15@gmail.com)
 - 💼 **LinkedIn**: [basavarajrevani](https://linkedin.com/in/basavarajrevani)
 - 🐦 **X (Twitter)**: [@basavarajrevani](https://x.com/basavarajrevani)
 - 💻 **GitHub**: [basavarajrevani](https://github.com/basavarajrevani)

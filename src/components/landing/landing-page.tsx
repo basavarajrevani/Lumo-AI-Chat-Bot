@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, MessageSquare, Zap, Shield, Sparkles, Brain, Globe, Users } from 'lucide-react';
+import { ArrowRight, MessageSquare, Zap, Shield, Sparkles, Brain, Globe, FileText } from 'lucide-react';
 import { Logo } from '../../components/ui/logo';
 import { SocialLinks, MadeWithLove } from '../../components/ui/social-links';
 import { PrivacyPolicy } from '../../components/legal/privacy-policy';
@@ -19,34 +19,34 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
 
   const features = [
     {
-      icon: Brain,
-      title: "AI-Powered Intelligence",
-      description: "Advanced conversations powered by Google Gemini AI for accurate, thoughtful responses."
+      icon: Sparkles,
+      title: "AI Expert Personas",
+      description: "Switch between specialized experts like Code Master, Creative Writer, and Language Tutor."
     },
     {
-      icon: MessageSquare,
-      title: "Natural Conversations",
-      description: "Chat naturally with context-aware responses that understand your needs."
-    },
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description: "Get instant responses with our optimized AI processing pipeline."
-    },
-    {
-      icon: Shield,
-      title: "Secure & Private",
-      description: "Your conversations are protected with enterprise-grade security."
+      icon: FileText,
+      title: "Smart File Processing",
+      description: "Extract and analyze content from PDF, Word, and Excel documents instantly."
     },
     {
       icon: Globe,
-      title: "Multi-Language",
-      description: "Communicate in multiple languages with seamless translation."
+      title: "Multi-Language Voice",
+      description: "Talk and listen in multiple languages including English, Hindi, Spanish, and French."
     },
     {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Share conversations and collaborate with your team members."
+      icon: Zap,
+      title: "Gemini 2.0 Power",
+      description: "Lightning-fast responses powered by the latest Google Gemini 2.0 Flash models."
+    },
+    {
+      icon: Brain,
+      title: "Advanced Vision",
+      description: "Upload images for deep visual analysis, OCR, and context-aware insights."
+    },
+    {
+      icon: Shield,
+      title: "Secure & Exportable",
+      description: "Your data is private. Export your chat history to PDF, Word, or Excel formats anytime."
     }
   ];
 
@@ -66,7 +66,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100
       }
     }
@@ -75,7 +75,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   return (
     <div className="landing-page main-container min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col overflow-y-auto">
       {/* Header */}
-      <motion.header 
+      <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="w-full p-4 sm:p-6 lg:p-8"
@@ -112,15 +112,15 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
             >
               <Sparkles className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-primary mb-4" />
             </motion.div>
-            
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent leading-tight">
               Meet Your Intelligent
               <br className="hidden sm:block" />
               <span className="block mt-2">AI Assistant</span>
             </h1>
-            
+
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-4">
-              Experience the future of AI conversation with Lumo.AI. Powered by Google Gemini, 
+              Experience the future of AI conversation with Lumo.AI. Powered by Google Gemini,
               get intelligent responses, creative solutions, and expert assistance for any task.
             </p>
           </motion.div>
@@ -140,7 +140,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               >
                 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </motion.div>
-              
+
               {/* Animated background */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -170,7 +170,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       </main>
 
       {/* Footer */}
-      <motion.footer 
+      <motion.footer
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
